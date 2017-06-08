@@ -42,7 +42,7 @@ while inputs:
             message_queues[connection] = Queue.Queue()
         else:
             data = s.recv(1024)
-            print data
+            print str(client_address)+": "+data
             if data:
                 message_queues[s].put(data)
                 if s not in outputs:
@@ -53,7 +53,7 @@ while inputs:
                 inputs.remove(s)
                 s.close()
                 del message_queues[s]
-    print writable
+
     for s in writable:
         try:
             next_msg = message_queues[s].get_nowait()
