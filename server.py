@@ -1,11 +1,23 @@
-import socket
+import select, socket, sys, Queue, time
+
+def broadcast_data (sock, message):
+    #Do not send the message to master socket and the client who has send us the message
+    for socket in inputs:
+        if socket != tcp_server and socket != sock :
+            try :
+                socket.send(message)
+            except :
+                # broken socket connection may be, chat client pressed ctrl+c for example
+                socket.close()
+                inputs.remove(socket)
+
 
 HOST = ''              # Server IP address
 PORT = 5000            # Server port
 
-
 #Init socket's variables
 tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+tcp_server.setblocking(0)
 server_address = (HOST, PORT)
 
 #Bind socket
@@ -14,17 +26,45 @@ tcp_server.bind(server_address)
 #Listen clients
 tcp_server.listen(5)
 
+#Declare sockets lists and queues
+inputs = [tcp_server]
+outputs = []
+message_queues = {}
+
 #Loop while to connect clients and message delivery
-while True:
-    con, cliente = tcp_server.accept()
-    print 'Concetado por', cliente
-    while True:
-        msg = con.recv(1024)
-        if not msg: break
-        print cliente, msg
-    print 'Finalizando conexao do cliente', cliente
-    con.close()
+while inputs:
+    readable, writable, exceptional = select.select(inputs, outputs, inputs)
+    for s in readable:
+        if s is tcp_server:
+            connection, client_address = s.accept()
+            connection.setblocking(0)
+            inputs.append(connection)
+            message_queues[connection] = Queue.Queue()
+        else:
+            data = s.recv(1024)
+            print data
+            if data:
+                message_queues[s].put(data)
+                if s not in outputs:
+                    outputs.append(s)
+            else:
+                if s in outputs:
+                    outputs.remove(s)
+                inputs.remove(s)
+                s.close()
+                del message_queues[s]
+    print writable
+    for s in writable:
+        try:
+            next_msg = message_queues[s].get_nowait()
+        except Queue.Empty:
+            outputs.remove(s)
+        else:
+        	broadcast_data(s,str(client_address)+" diz:\n\t"+next_msg)
 
-
-
-    #readable, writable, exceptional = select.select(inputs, outputs, inputs)
+    for s in exceptional:
+        inputs.remove(s)
+        if s in outputs:
+            outputs.remove(s)
+        s.close()
+        del message_queues[s]

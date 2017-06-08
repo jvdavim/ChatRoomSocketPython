@@ -1,10 +1,4 @@
-import socket
-import sys
-import select
-import userlib
-
-
-#class Client(Thread)
+from GUI import *
 
 HOST = '127.0.0.1'     # Server IP address
 PORT = 5000            # Server port
@@ -13,12 +7,14 @@ PORT = 5000            # Server port
 tcp_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 dest = (HOST, PORT)
 
-#Connect to server
-tcp_client.connect(dest)
-print 'Para sair use CTRL+X\n'
+tcp_client.connect(dest)	#Connect to server
 
-msg = raw_input()
-while msg <> '\x18':
-    tcp_client.send (msg)
-    msg = raw_input()
-tcp_client.close
+#Call GUI thread
+gui = GuiThread(tcp_client)
+gui.start()
+
+while True:
+    data = tcp_client.recv(1024)
+    gui.show(data)
+
+tcp_client.close()

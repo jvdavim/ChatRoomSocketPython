@@ -1,32 +1,50 @@
+import socket
+from threading import Thread
 from Tkinter import *
 
-def sendText(event=None):
-    textarea.config(state=NORMAL)
-    textarea.insert(END,"Fulano diz: \n\t"+writearea.get("1.0",END))
-    textarea.config(state=DISABLED)
-    textarea.see("end")
-    writearea.delete("1.0",END)
+class GuiThread(Thread):
+	def __init__(self, tcp_client):
+		Thread.__init__(self)
+		self.tcp_client = tcp_client
+	
+	def run(self):
+		self.s=Tk()
 
-start=Tk()
+		self.frame=Frame(self.s, height=500)
+		self.s.title("Ez Pz Chat")
 
-frame=Frame(start, height=500)
-start.title("Web Chat++")
+		self.sendbutton=Button(text="ENVIAR",bg="#128C7E",fg="white",command=self.sendText)
+		self.sendbutton.pack(side=BOTTOM)
 
-writearea=Text(height=5, width=50)
-writearea.pack(side=BOTTOM)
+		self.writearea=Text(height=5, width=50)
+		self.writearea.pack(side=BOTTOM)
 
-sendbutton=Button(text="ENVIAR",bg="#128C7E",fg="white",command=sendText)
-sendbutton.pack(side=BOTTOM)
+		self.textarea=Text(height=25, width=50)
+		self.textarea.pack()
+		self.scrollbar=Scrollbar()
+		self.textarea.pack(side=LEFT, fill=Y)
+		self.scrollbar.pack(side=RIGHT, fill=Y)
+		self.scrollbar.config(command=self.textarea.yview)
+		self.textarea.config(yscrollcommand=self.scrollbar.set)
+		self.textarea.config(state=DISABLED)
 
-textarea=Text(height=25, width=50)
-textarea.pack()
-scrollbar=Scrollbar()
-textarea.pack(side=LEFT, fill=Y)
-scrollbar.pack(side=RIGHT, fill=Y)
-scrollbar.config(command=textarea.yview)
-textarea.config(yscrollcommand=scrollbar.set)
-textarea.config(state=DISABLED)
+		self.s.bind("<Return>",self.sendText)
+		self.frame.pack()
 
-start.bind("<Return>",sendText)
-frame.pack()
-start.mainloop()
+		self.writearea.focus_set()
+
+		self.s.mainloop()
+
+	def sendText(self, event=None):
+	    self.textarea.config(state=NORMAL)
+	    msg = self.writearea.get("1.0",END)
+	    self.textarea.insert(END,"Eu: \n\t"+msg)
+	    self.tcp_client.send(msg)
+	    self.textarea.config(state=DISABLED)
+	    self.textarea.see("end")
+	    self.writearea.delete("1.0",END)
+
+	def show(self, data):
+		self.textarea.config(state=NORMAL)
+		self.textarea.insert(END,data)
+		self.textarea.config(state=DISABLED)
