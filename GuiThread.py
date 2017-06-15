@@ -16,11 +16,14 @@ class GuiThread(Thread):
 
 		self.buttonframe=Frame(self.s)
 
-		self.imagebutton=Button(text="TRANSFERIR ARQUIVO",bg="#128C7E",fg="white",command=self.sendFile)
+		self.imagebutton=Button(text="TRANSFERIR ARQUIVO",bg="#128C7E",fg="white",command=self.sendImage)
 		self.imagebutton.pack(in_=self.buttonframe, side=RIGHT)
 
-		self.sendbutton=Button(text="ENVIAR",bg="#128C7E",fg="white",command=self.sendText)
+		self.sendbutton=Button(text="ENVIAR",bg="#075E54",fg="white",command=self.sendText)
 		self.sendbutton.pack(in_=self.buttonframe, side=RIGHT)
+
+		self.filebutton=Button(text="CARREGAR TEXTO",bg="#128C7E",fg="white",command=self.sendFile)
+		self.filebutton.pack(in_=self.buttonframe, side=RIGHT)
 
 		self.writearea=Text(height=5, width=50)
 		self.writearea.pack(in_=self.frame, side=BOTTOM)
@@ -41,11 +44,13 @@ class GuiThread(Thread):
 
 		self.writearea.focus_set()
 
-		self.tcp_client.send("ENTROU NA SALA\n")
+		self.tcp_client.send("/ENTROU NA SALA/\n")
 
 		self.textarea.config(state=NORMAL)
-		self.textarea.insert(END,"Eu: \n\tENTROU NA SALA\n")
+		self.textarea.insert(END,"Eu: \n\t/ENTROU NA SALA/\n")
 		self.textarea.config(state=DISABLED)
+
+		self.s.resizable(width=False,height=False)
 
 		self.s.mainloop()
 
@@ -59,19 +64,42 @@ class GuiThread(Thread):
 	    self.writearea.delete("1.0",END)
 
 	def show(self, data):
-		self.textarea.config(state=NORMAL)
-		self.textarea.insert(END,data.decode("utf-8"))
-		self.textarea.config(state=DISABLED)
-
-	def isRunning(self):
-		if self.s.state() != 'normal':
-			return False
-		return True
+		if data[0]=='i':
+			data=data[1:]
+			self.textarea.config(state=NORMAL)
+			self.textarea.insert(END,data.split("\n")[0])
+			self.textarea.insert(END,"\n"+data.split("\n")[1])
+			self.textarea.insert(END,"\n\t/FILE RECEIVED/")
+			self.textarea.config(state=DISABLED)
+			filename=data.split("\n")[1].split("/")[-1]
+			myfile=open(filename,"wb")
+			for i in data.split("\n")[2:]:
+				myfile.write(i+"\n")
+			myfile.close()
+		else:
+			self.textarea.config(state=NORMAL)
+			self.textarea.insert(END,data.decode("utf-8"))
+			self.textarea.config(state=DISABLED)
 
 	def sendFile(self, event=None):
 	    path=askopenfilename()
-	    self.tcp_client.send(path+"\n".encode("utf-8")+open(path,"rb").read())
+	    myfile=open(path,"rb")
+	    data=myfile.read()
+	    myfile.close()
+	    self.tcp_client.send((path+"\n"+data).encode("utf-8"))
+	    self.textarea.config(state=NORMAL)
+	    self.textarea.insert(END,"Eu: \n\t"+path+"\n"+data)
+	    self.textarea.config(state=DISABLED)
+	    self.textarea.see("end")
+
+	def sendImage(self,event=None):
+	    path=askopenfilename()
+	    myfile=open(path,"rb")
+	    data=myfile.read()
+	    myfile.close()
+	    self.tcp_client.send("i"+path+"\n"+data)
 	    self.textarea.config(state=NORMAL)
 	    self.textarea.insert(END,"Eu: \n\t"+path+"\n")
+	    #self.textarea.image_create(END,image=path)
 	    self.textarea.config(state=DISABLED)
 	    self.textarea.see("end")

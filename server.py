@@ -69,7 +69,10 @@ while inputs:
         except Queue.Empty:
             outputs.remove(s)
         else:
-        	broadcast_data(s,str(client_address)+" diz:\n\t"+next_msg)
+		if next_msg[:2]=='i/':
+			broadcast_data(s,"i"+str(client_address)+" diz:\n\t"+next_msg[1:])
+		else:
+        		broadcast_data(s,str(client_address)+" diz:\n\t"+next_msg)
 
     for s in exceptional:
         inputs.remove(s)
