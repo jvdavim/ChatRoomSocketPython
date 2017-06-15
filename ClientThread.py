@@ -1,4 +1,4 @@
-import socket
+import socket, os
 from threading import Thread
 from GuiThread import *
 
@@ -18,4 +18,6 @@ class ClientThread(Thread):
             self.data = self.tcp_client.recv(1024)
             self.gui.show(self.data)
 	    self.gui.textarea.see("end")
+	    os.system("play --no-show-progress --null --channels 1 synth 1 sine 1000")
+
 
