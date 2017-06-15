@@ -1,6 +1,7 @@
 import socket
 from threading import Thread
 from Tkinter import *
+from tkFileDialog import askopenfilename
 
 class GuiThread(Thread):
 	def __init__(self, tcp_client):
@@ -13,7 +14,7 @@ class GuiThread(Thread):
 		self.frame=Frame(self.s, height=500)
 		self.s.title("Ez Pz Chat")
 
-		self.imagebutton=Button(text="IMAGEM",bg="#128C7E",fg="white",command=self.sendImage)
+		self.imagebutton=Button(text="TRANSFERIR ARQUIVO",bg="#128C7E",fg="white",command=self.sendFile)
 		self.imagebutton.pack(side=BOTTOM)
 
 		self.sendbutton=Button(text="ENVIAR",bg="#128C7E",fg="white",command=self.sendText)
@@ -58,8 +59,10 @@ class GuiThread(Thread):
 			return False
 		return True
 
-	def sendImage(self, event=None):
+	def sendFile(self, event=None):
+	    path=askopenfilename()
+	    self.tcp_client.send(path.encode("utf-8"))
 	    self.textarea.config(state=NORMAL)
-	    self.textarea.insert(END,"Eu: \n\t"+"IMAGEM")
+	    self.textarea.insert(END,"Eu: \n\t"+path)
 	    self.textarea.config(state=DISABLED)
 	    self.textarea.see("end")
