@@ -2,7 +2,7 @@ import select, socket, sys, Queue, time, signal
 
 #Exit handler
 def signal_handler(signal, frame):
-    print "\nSuccesful exit"
+    print "\nSuccessful exit. Server is now down."
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -37,6 +37,8 @@ tcp_server.listen(5)
 inputs = [tcp_server]
 outputs = []
 message_queues = {}
+
+print "Successful creation. Server is now up."
 
 #Loop while to connect clients and message delivery
 while inputs:
