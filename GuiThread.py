@@ -14,20 +14,22 @@ class GuiThread(Thread):
 		self.frame=Frame(self.s, height=500)
 		self.s.title("Ez Pz Chat")
 
+		self.buttonframe=Frame(self.s)
+
 		self.imagebutton=Button(text="TRANSFERIR ARQUIVO",bg="#128C7E",fg="white",command=self.sendFile)
-		self.imagebutton.pack(side=BOTTOM)
+		self.imagebutton.pack(in_=self.buttonframe, side=RIGHT)
 
 		self.sendbutton=Button(text="ENVIAR",bg="#128C7E",fg="white",command=self.sendText)
-		self.sendbutton.pack(side=BOTTOM)
+		self.sendbutton.pack(in_=self.buttonframe, side=RIGHT)
 
 		self.writearea=Text(height=5, width=50)
-		self.writearea.pack(side=BOTTOM)
+		self.writearea.pack(in_=self.frame, side=BOTTOM)
 
 		self.textarea=Text(height=25, width=50)
-		self.textarea.pack()
+		self.textarea.pack(in_=self.frame)
 		self.scrollbar=Scrollbar()
 		self.textarea.pack(side=LEFT, fill=Y)
-		self.scrollbar.pack(side=RIGHT, fill=Y)
+		self.scrollbar.pack(in_=self.frame, side=RIGHT, fill=Y)
 		self.scrollbar.config(command=self.textarea.yview)
 		self.textarea.config(yscrollcommand=self.scrollbar.set)
 		self.textarea.config(state=DISABLED)
@@ -35,6 +37,7 @@ class GuiThread(Thread):
 		self.s.bind("<Return>",self.sendText)
 		self.s.bind("<KP_Enter>",self.sendText)
 		self.frame.pack()
+		self.buttonframe.pack(side=BOTTOM)
 
 		self.writearea.focus_set()
 
