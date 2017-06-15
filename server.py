@@ -1,4 +1,11 @@
-import select, socket, sys, Queue, time
+import select, socket, sys, Queue, time, signal
+
+# Exit handler #
+def signal_handler(signal, frame):
+    print "\nSuccesful exit"
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+# Exit handler #
 
 def broadcast_data (sock, message):
     #Do not send the message to master socket and the client who has send us the message
@@ -68,3 +75,5 @@ while inputs:
             outputs.remove(s)
         s.close()
         del message_queues[s]
+
+tcp_server.close()
