@@ -29,6 +29,7 @@ class GuiThread(Thread):
 		self.textarea.config(state=DISABLED)
 
 		self.s.bind("<Return>",self.sendText)
+		self.s.bind("<KP_Enter>",self.sendText)
 		self.frame.pack()
 
 		self.writearea.focus_set()
