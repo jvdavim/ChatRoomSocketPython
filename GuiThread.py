@@ -41,6 +41,12 @@ class GuiThread(Thread):
 
 		self.writearea.focus_set()
 
+		self.tcp_client.send("ENTROU NA SALA\n")
+
+		self.textarea.config(state=NORMAL)
+		self.textarea.insert(END,"Eu: \n\tENTROU NA SALA\n")
+		self.textarea.config(state=DISABLED)
+
 		self.s.mainloop()
 
 	def sendText(self, event=None):
@@ -64,8 +70,8 @@ class GuiThread(Thread):
 
 	def sendFile(self, event=None):
 	    path=askopenfilename()
-	    self.tcp_client.send(path.encode("utf-8"))
+	    self.tcp_client.send(path+"\n".encode("utf-8")+open(path,"rb").read())
 	    self.textarea.config(state=NORMAL)
-	    self.textarea.insert(END,"Eu: \n\t"+path)
+	    self.textarea.insert(END,"Eu: \n\t"+path+"\n")
 	    self.textarea.config(state=DISABLED)
 	    self.textarea.see("end")

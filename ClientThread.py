@@ -17,4 +17,5 @@ class ClientThread(Thread):
         while True:
             self.data = self.tcp_client.recv(1024)
             self.gui.show(self.data)
+	    self.gui.textarea.see("end")
 
