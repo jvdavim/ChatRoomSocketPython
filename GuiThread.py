@@ -13,6 +13,9 @@ class GuiThread(Thread):
 		self.frame=Frame(self.s, height=500)
 		self.s.title("Ez Pz Chat")
 
+		self.imagebutton=Button(text="IMAGEM",bg="#128C7E",fg="white",command=self.sendImage)
+		self.imagebutton.pack(side=BOTTOM)
+
 		self.sendbutton=Button(text="ENVIAR",bg="#128C7E",fg="white",command=self.sendText)
 		self.sendbutton.pack(side=BOTTOM)
 
@@ -37,10 +40,10 @@ class GuiThread(Thread):
 		self.s.mainloop()
 
 	def sendText(self, event=None):
-	    self.textarea.config(state=NORMAL)
 	    msg = self.writearea.get("1.0",END)
-	    self.textarea.insert(END,"Eu: \n\t"+msg)
 	    self.tcp_client.send(msg.encode("utf-8"))
+	    self.textarea.config(state=NORMAL)
+	    self.textarea.insert(END,"Eu: \n\t"+msg)
 	    self.textarea.config(state=DISABLED)
 	    self.textarea.see("end")
 	    self.writearea.delete("1.0",END)
@@ -54,3 +57,9 @@ class GuiThread(Thread):
 		if self.s.state() != 'normal':
 			return False
 		return True
+
+	def sendImage(self, event=None):
+	    self.textarea.config(state=NORMAL)
+	    self.textarea.insert(END,"Eu: \n\t"+"IMAGEM")
+	    self.textarea.config(state=DISABLED)
+	    self.textarea.see("end")
