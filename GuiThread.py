@@ -69,7 +69,7 @@ class GuiThread(Thread):
 			self.textarea.config(state=NORMAL)
 			self.textarea.insert(END,data.split("\n")[0])
 			self.textarea.insert(END,"\n"+data.split("\n")[1])
-			self.textarea.insert(END,"\n\t/FILE RECEIVED/")
+			self.textarea.insert(END,"\n\t/ARQUIVO RECEBIDO/")
 			self.textarea.config(state=DISABLED)
 			filename=data.split("\n")[1].split("/")[-1]
 			myfile=open(filename,"wb")
