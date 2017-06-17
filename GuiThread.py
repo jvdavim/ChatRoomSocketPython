@@ -1,4 +1,4 @@
-import socket
+import socket, time
 from threading import Thread
 from Tkinter import *
 from tkFileDialog import askopenfilename
@@ -42,16 +42,30 @@ class GuiThread(Thread):
 		self.frame.pack()
 		self.buttonframe.pack(side=BOTTOM)
 
-		self.writearea.focus_set()
-
-		self.tcp_client.send("/ENTROU NA SALA/\n")
-
-		self.textarea.config(state=NORMAL)
-		self.textarea.insert(END,"Eu: \n\t/ENTROU NA SALA/\n")
-		self.textarea.config(state=DISABLED)
-
 		self.s.resizable(width=False,height=False)
 
+		self.writearea.focus_set()
+
+		self.login=Toplevel()
+		userframe=Frame(self.login)
+		#passframe=Frame(self.login)
+		label=Label(userframe,text="Nome de usuario:")
+		label.pack(side=LEFT)
+		self.username=Text(userframe,width=15,height=1)
+		self.username.pack(side=LEFT)
+		#label2=Label(passframe,text="Senha de acesso:")
+		#label2.pack(side=LEFT)
+		#password=Text(passframe,width=15,height=1)
+		#password.pack(side=LEFT)
+		userframe.pack()
+		#passframe.pack()
+		authbutton=Button(self.login,text="ENTRAR",bg="#25D366",fg="white",command=self.auth)
+		authbutton.pack()
+		self.login.attributes("-topmost",True)
+		#self.login.bind("<Return>",self.auth)
+		#self.login.bind("<KP_Enter>",self.auth)
+
+		self.s.withdraw()
 		self.s.mainloop()
 
 	def sendText(self, event=None):
@@ -103,3 +117,17 @@ class GuiThread(Thread):
 	    #self.textarea.image_create(END,image=path)
 	    self.textarea.config(state=DISABLED)
 	    self.textarea.see("end")
+
+	def auth(self,event=None):
+		self.tcp_client.send(("l/"+self.username.get("1.0",END)).encode("utf-8"))
+		time.sleep(1)
+
+		self.tcp_client.send("/ENTROU NA SALA/\n")
+
+		self.textarea.config(state=NORMAL)
+		self.textarea.insert(END,"Eu: \n\t/ENTROU NA SALA/\n")
+		self.textarea.config(state=DISABLED)
+
+		self.login.destroy()
+		self.s.deiconify()
+

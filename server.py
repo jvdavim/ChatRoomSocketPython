@@ -37,6 +37,7 @@ tcp_server.listen(5)
 inputs = [tcp_server]
 outputs = []
 message_queues = {}
+users={}
 
 print "Successful creation. Server is now up."
 
@@ -70,9 +71,11 @@ while inputs:
             outputs.remove(s)
         else:
 		if next_msg[:2]=='i/':
-			broadcast_data(s,"i"+str(client_address)+" diz:\n\t"+next_msg[1:])
+			broadcast_data(s,"i"+users[str(client_address)]+" diz:\n\t"+next_msg[1:])
+		elif next_msg[:2]=="l/":
+			users[str(client_address)]=next_msg[2:-1].decode("utf-8")
 		else:
-        		broadcast_data(s,str(client_address)+" diz:\n\t"+next_msg)
+        		broadcast_data(s,users[str(client_address)]+" diz:\n\t"+next_msg)
 
     for s in exceptional:
         inputs.remove(s)
