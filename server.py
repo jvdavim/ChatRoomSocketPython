@@ -1,4 +1,4 @@
-import select, socket, sys, Queue, time, signal
+import select, socket, sys, Queue, time, signal, ssl
 
 #Exit handler
 def signal_handler(signal, frame):
@@ -24,6 +24,8 @@ PORT = 5000            # Server port
 
 #Init socket's variables
 tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sslcontext = ssl._create_unverified_context()
+sslcontext.load_cert_chain(certfile="server.crt", keyfile="server.key")
 tcp_server.setblocking(0)
 server_address = (HOST, PORT)
 
@@ -47,9 +49,10 @@ while inputs:
     for s in readable:
         if s is tcp_server:
             connection, client_address = s.accept()
-            connection.setblocking(0)
-            inputs.append(connection)
-            message_queues[connection] = Queue.Queue()
+	    sslcon=sslcontext.wrap_socket(connection, server_side=True)
+            sslcon.setblocking(0)
+            inputs.append(sslcon)
+            message_queues[sslcon] = Queue.Queue()
         else:
             data = s.recv(1024)
             print str(client_address)+": "+data
