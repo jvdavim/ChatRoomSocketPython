@@ -10,7 +10,18 @@ signal.signal(signal.SIGINT, signal_handler)
 def broadcast_data (sock, message):
 	#Do not send the message to master socket and the client who has send us the message
 	for socket in inputs:
-		if socket != tcp_server and socket != sock :
+		if socket != tcp_server and socket != sock:
+			try :
+				socket.send(message)
+			except :
+				# broken socket connection may be, chat client pressed ctrl+c for example
+				socket.close()
+				inputs.remove(socket)
+
+def send_data_to(sock, message):
+	#Do not send the message to master socket and the client who has send us the message
+	for socket in inputs:
+		if socket == sock:
 			try :
 				socket.send(message)
 			except :
@@ -49,7 +60,7 @@ while inputs:
 	for s in readable:
 		if s is tcp_server:
 			connection, client_address = s.accept()
-		sslcon=sslcontext.wrap_socket(connection, server_side=True)
+			sslcon=sslcontext.wrap_socket(connection, server_side=True)
 			sslcon.setblocking(0)
 			inputs.append(sslcon)
 			message_queues[sslcon] = Queue.Queue()
@@ -73,11 +84,28 @@ while inputs:
 		except Queue.Empty:
 			outputs.remove(s)
 		else:
-		if next_msg[:2]=='i/':
-			broadcast_data(s,"i"+users[str(client_address)]+" diz:\n\t"+next_msg[1:])
-		elif next_msg[:2]=="l/":
-			users[str(client_address)]=next_msg[2:-1].decode("utf-8")
-		else:
+			if next_msg[:2]=='i/':
+				broadcast_data(s,"i"+users[str(client_address)]+" diz:\n\t"+next_msg[1:])
+			elif next_msg[:2]=="l/":
+				users[str(client_address)]=next_msg[2:-1].decode("utf-8")
+				f=open("users.txt","r")
+				for i in f.readlines():
+					if next_msg[2:]==i:
+						broadcast_data(s,i.split(" ")[0]+" entrou na sala.")
+						send_data_to(s,"OK OK")
+				f.close()
+			elif next_msg[:2]=="c/":
+				f=open("users.txt","r+")
+				conflict=False
+				for i in f.readlines():
+					if i.split(" ")[0]==next_msg[2:].split(" ")[0]:
+						conflict=True
+				if conflict:
+					print "Ja Existe"
+				else:
+					f.write(next_msg[2:])
+				f.close()
+			else:
 				broadcast_data(s,users[str(client_address)]+" diz:\n\t"+next_msg)
 
 	for s in exceptional:

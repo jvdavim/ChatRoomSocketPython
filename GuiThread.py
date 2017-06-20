@@ -48,22 +48,28 @@ class GuiThread(Thread):
 
 		self.login=Toplevel()
 		userframe=Frame(self.login)
-		#passframe=Frame(self.login)
+		passframe=Frame(self.login)
+		loginframe=Frame(self.login)
 		label=Label(userframe,text="Nome de usuario:")
 		label.pack(side=LEFT)
 		self.username=Text(userframe,width=15,height=1)
 		self.username.pack(side=LEFT)
-		#label2=Label(passframe,text="Senha de acesso:")
-		#label2.pack(side=LEFT)
-		#password=Text(passframe,width=15,height=1)
-		#password.pack(side=LEFT)
+		label2=Label(passframe,text="Senha de acesso:")
+		label2.pack(side=LEFT)
+		self.password=Text(passframe,width=15,height=1)
+		self.password.pack(side=LEFT)
 		userframe.pack()
-		#passframe.pack()
-		authbutton=Button(self.login,text="ENTRAR",bg="#25D366",fg="white",command=self.auth)
-		authbutton.pack()
+		passframe.pack()
+		authbutton=Button(loginframe,text="ENTRAR",bg="#25D366",fg="white",command=self.auth)
+		authbutton.pack(side=LEFT)
+		logup=Button(loginframe,text="CADASTRAR",bg="#25D366",fg="white",command=self.register)
+		logup.pack(side=LEFT)
+		loginframe.pack()
 		self.login.attributes("-topmost",True)
-		#self.login.bind("<Return>",self.auth)
-		#self.login.bind("<KP_Enter>",self.auth)
+		self.username.bind("<Return>",self.auth)
+		self.username.bind("<KP_Enter>",self.auth)
+		self.password.bind("<Return>",self.auth)
+		self.password.bind("<KP_Enter>",self.auth)
 
 		self.s.withdraw()
 		self.s.mainloop()
@@ -90,9 +96,12 @@ class GuiThread(Thread):
 			for i in data.split("\n")[2:]:
 				myfile.write(i+"\n")
 			myfile.close()
+		# elif data.split(" ")[1]=="OK":
+		# 	self.login.destroy()
+		# 	self.s.deiconify()
 		else:
 			self.textarea.config(state=NORMAL)
-			self.textarea.insert(END,data.decode("utf-8"))
+			self.textarea.insert(END,data.decode("utf-8")+"\n")
 			self.textarea.config(state=DISABLED)
 
 	def sendFile(self, event=None):
@@ -119,15 +128,18 @@ class GuiThread(Thread):
 		self.textarea.see("end")
 
 	def auth(self,event=None):
-		self.tcp_client.send(("l/"+self.username.get("1.0",END)).encode("utf-8"))
+		self.tcp_client.send(("l/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
 		time.sleep(1)
 
-		self.tcp_client.send("/ENTROU NA SALA/\n")
+		# self.tcp_client.send("/ENTROU NA SALA/\n")
 
-		self.textarea.config(state=NORMAL)
-		self.textarea.insert(END,"Eu: \n\t/ENTROU NA SALA/\n")
-		self.textarea.config(state=DISABLED)
+		# self.textarea.config(state=NORMAL)
+		# self.textarea.insert(END,"Eu: \n\t/ENTROU NA SALA/\n")
+		# self.textarea.config(state=DISABLED)
 
 		self.login.destroy()
 		self.s.deiconify()
 
+	def register(self,event=None):
+		self.tcp_client.send(("c/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
+		time.sleep(1)

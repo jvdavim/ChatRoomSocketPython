@@ -18,7 +18,9 @@ class ClientThread(Thread):
 		self.gui.start()
 		while True:
 			self.data = self.sslcon.recv(1024)
-			self.gui.show(self.data)
+			print self.data
+			if self.data!="":
+				self.gui.show(self.data)
 		self.gui.textarea.see("end")
 		#os.system("play --no-show-progress --null --channels 1 synth 1 sine 1000")  #BARUHLHO
 
