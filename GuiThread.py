@@ -8,9 +8,12 @@ class GuiThread(Thread):
 		Thread.__init__(self)
 		self.tcp_client = tcp_client
 		self.running = True
+
 	
 	def run(self):
 		self.s=Tk()
+
+		self.s.protocol("WM_DELETE_WINDOW", self.on_close)
 
 		self.frame=Frame(self.s, height=500)
 		self.s.title("Ez Pz Chat")
@@ -86,6 +89,7 @@ class GuiThread(Thread):
 
 	def show(self, data):
 		if data[0]=='i':
+			print data
 			data=data[1:]
 			self.textarea.config(state=NORMAL)
 			self.textarea.insert(END,data.split("\n")[0])
@@ -136,8 +140,8 @@ class GuiThread(Thread):
 		self.tcp_client.send(("c/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
 		time.sleep(1)
 
-	def on_close():
-		if messagebox.askokcancel("Sair", "Tem certeza que deseja sair?"):
-			self.running = False
-			tcp_client.close()
-			s.destroy()
+	def on_close(self):
+		self.running = False
+		self.tcp_client.close()
+		self.s.destroy()
+		sys.exit(0)
