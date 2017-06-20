@@ -114,5 +114,6 @@ while inputs:
 			outputs.remove(s)
 		s.close()
 		del message_queues[s]
-
+		
+tcp_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 tcp_server.close()

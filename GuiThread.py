@@ -96,9 +96,9 @@ class GuiThread(Thread):
 			for i in data.split("\n")[2:]:
 				myfile.write(i+"\n")
 			myfile.close()
-		# elif data.split(" ")[1]=="OK":
-		# 	self.login.destroy()
-		# 	self.s.deiconify()
+		elif data.split(" ")[1]=="OK":
+			self.login.destroy()
+			self.s.deiconify()
 		else:
 			self.textarea.config(state=NORMAL)
 			self.textarea.insert(END,data.decode("utf-8")+"\n")
@@ -137,8 +137,8 @@ class GuiThread(Thread):
 		# self.textarea.insert(END,"Eu: \n\t/ENTROU NA SALA/\n")
 		# self.textarea.config(state=DISABLED)
 
-		self.login.destroy()
-		self.s.deiconify()
+		# self.login.destroy()
+		# self.s.deiconify()
 
 	def register(self,event=None):
 		self.tcp_client.send(("c/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))

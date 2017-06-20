@@ -18,7 +18,6 @@ class ClientThread(Thread):
 		self.gui.start()
 		while True:
 			self.data = self.sslcon.recv(1024)
-			print self.data
 			if self.data!="":
 				self.gui.show(self.data)
 		self.gui.textarea.see("end")
