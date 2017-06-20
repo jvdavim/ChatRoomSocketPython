@@ -69,13 +69,13 @@ class GuiThread(Thread):
 		self.s.mainloop()
 
 	def sendText(self, event=None):
-	    msg = self.writearea.get("1.0",END)
-	    self.tcp_client.send(msg.encode("utf-8"))
-	    self.textarea.config(state=NORMAL)
-	    self.textarea.insert(END,"Eu: \n\t"+msg)
-	    self.textarea.config(state=DISABLED)
-	    self.textarea.see("end")
-	    self.writearea.delete("1.0",END)
+		msg = self.writearea.get("1.0",END)
+		self.tcp_client.send(msg.encode("utf-8"))
+		self.textarea.config(state=NORMAL)
+		self.textarea.insert(END,"Eu: \n\t"+msg)
+		self.textarea.config(state=DISABLED)
+		self.textarea.see("end")
+		self.writearea.delete("1.0",END)
 
 	def show(self, data):
 		if data[0]=='i':
@@ -96,27 +96,27 @@ class GuiThread(Thread):
 			self.textarea.config(state=DISABLED)
 
 	def sendFile(self, event=None):
-	    path=askopenfilename()
-	    myfile=open(path,"rb")
-	    data=myfile.read()
-	    myfile.close()
-	    self.tcp_client.send((path+"\n"+data).encode("utf-8"))
-	    self.textarea.config(state=NORMAL)
-	    self.textarea.insert(END,"Eu: \n\t"+path+"\n"+data)
-	    self.textarea.config(state=DISABLED)
-	    self.textarea.see("end")
+		path=askopenfilename()
+		myfile=open(path,"rb")
+		data=myfile.read()
+		myfile.close()
+		self.tcp_client.send((path+"\n"+data).encode("utf-8"))
+		self.textarea.config(state=NORMAL)
+		self.textarea.insert(END,"Eu: \n\t"+path+"\n"+data)
+		self.textarea.config(state=DISABLED)
+		self.textarea.see("end")
 
 	def sendImage(self,event=None):
-	    path=askopenfilename()
-	    myfile=open(path,"rb")
-	    data=myfile.read()
-	    myfile.close()
-	    self.tcp_client.send("i"+path+"\n"+data)
-	    self.textarea.config(state=NORMAL)
-	    self.textarea.insert(END,"Eu: \n\t"+path+"\n")
-	    #self.textarea.image_create(END,image=path)
-	    self.textarea.config(state=DISABLED)
-	    self.textarea.see("end")
+		path=askopenfilename()
+		myfile=open(path,"rb")
+		data=myfile.read()
+		myfile.close()
+		self.tcp_client.send("i"+path+"\n"+data)
+		self.textarea.config(state=NORMAL)
+		self.textarea.insert(END,"Eu: \n\t"+path+"\n")
+		#self.textarea.image_create(END,image=path)
+		self.textarea.config(state=DISABLED)
+		self.textarea.see("end")
 
 	def auth(self,event=None):
 		self.tcp_client.send(("l/"+self.username.get("1.0",END)).encode("utf-8"))
