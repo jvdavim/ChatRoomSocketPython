@@ -2,25 +2,25 @@ import select, socket, sys, Queue, time, signal, ssl
 
 #Exit handler
 def signal_handler(signal, frame):
-    print "\nSuccessful exit. Server is now down."
-    sys.exit(0)
+	print "\nSuccessful exit. Server is now down."
+	sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
 
 def broadcast_data (sock, message):
-    #Do not send the message to master socket and the client who has send us the message
-    for socket in inputs:
-        if socket != tcp_server and socket != sock :
-            try :
-                socket.send(message)
-            except :
-                # broken socket connection may be, chat client pressed ctrl+c for example
-                socket.close()
-                inputs.remove(socket)
+	#Do not send the message to master socket and the client who has send us the message
+	for socket in inputs:
+		if socket != tcp_server and socket != sock :
+			try :
+				socket.send(message)
+			except :
+				# broken socket connection may be, chat client pressed ctrl+c for example
+				socket.close()
+				inputs.remove(socket)
 
 
-HOST = ''              # Server IP address
-PORT = 5000            # Server port
+HOST = ''			  # Server IP address
+PORT = 5000			# Server port
 
 #Init socket's variables
 tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,46 +45,46 @@ print "Successful creation. Server is now up."
 
 #Loop while to connect clients and message delivery
 while inputs:
-    readable, writable, exceptional = select.select(inputs, outputs, inputs)
-    for s in readable:
-        if s is tcp_server:
-            connection, client_address = s.accept()
-	    sslcon=sslcontext.wrap_socket(connection, server_side=True)
-            sslcon.setblocking(0)
-            inputs.append(sslcon)
-            message_queues[sslcon] = Queue.Queue()
-        else:
-            data = s.recv(1024)
-            print str(client_address)+": "+data
-            if data:
-                message_queues[s].put(data)
-                if s not in outputs:
-                    outputs.append(s)
-            else:
-                if s in outputs:
-                    outputs.remove(s)
-                inputs.remove(s)
-                s.close()
-                del message_queues[s]
+	readable, writable, exceptional = select.select(inputs, outputs, inputs)
+	for s in readable:
+		if s is tcp_server:
+			connection, client_address = s.accept()
+		sslcon=sslcontext.wrap_socket(connection, server_side=True)
+			sslcon.setblocking(0)
+			inputs.append(sslcon)
+			message_queues[sslcon] = Queue.Queue()
+		else:
+			data = s.recv(1024)
+			print str(client_address)+": "+data
+			if data:
+				message_queues[s].put(data)
+				if s not in outputs:
+					outputs.append(s)
+			else:
+				if s in outputs:
+					outputs.remove(s)
+				inputs.remove(s)
+				s.close()
+				del message_queues[s]
 
-    for s in writable:
-        try:
-            next_msg = message_queues[s].get_nowait()
-        except Queue.Empty:
-            outputs.remove(s)
-        else:
+	for s in writable:
+		try:
+			next_msg = message_queues[s].get_nowait()
+		except Queue.Empty:
+			outputs.remove(s)
+		else:
 		if next_msg[:2]=='i/':
 			broadcast_data(s,"i"+users[str(client_address)]+" diz:\n\t"+next_msg[1:])
 		elif next_msg[:2]=="l/":
 			users[str(client_address)]=next_msg[2:-1].decode("utf-8")
 		else:
-        		broadcast_data(s,users[str(client_address)]+" diz:\n\t"+next_msg)
+				broadcast_data(s,users[str(client_address)]+" diz:\n\t"+next_msg)
 
-    for s in exceptional:
-        inputs.remove(s)
-        if s in outputs:
-            outputs.remove(s)
-        s.close()
-        del message_queues[s]
+	for s in exceptional:
+		inputs.remove(s)
+		if s in outputs:
+			outputs.remove(s)
+		s.close()
+		del message_queues[s]
 
 tcp_server.close()
