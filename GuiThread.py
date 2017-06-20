@@ -7,6 +7,7 @@ class GuiThread(Thread):
 	def __init__(self, tcp_client):
 		Thread.__init__(self)
 		self.tcp_client = tcp_client
+		self.running = True
 	
 	def run(self):
 		self.s=Tk()
@@ -131,15 +132,12 @@ class GuiThread(Thread):
 		self.tcp_client.send(("l/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
 		time.sleep(1)
 
-		# self.tcp_client.send("/ENTROU NA SALA/\n")
-
-		# self.textarea.config(state=NORMAL)
-		# self.textarea.insert(END,"Eu: \n\t/ENTROU NA SALA/\n")
-		# self.textarea.config(state=DISABLED)
-
-		# self.login.destroy()
-		# self.s.deiconify()
-
 	def register(self,event=None):
 		self.tcp_client.send(("c/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
 		time.sleep(1)
+
+	def on_close():
+		if messagebox.askokcancel("Sair", "Tem certeza que deseja sair?"):
+			self.running = False
+			tcp_client.close()
+			s.destroy()

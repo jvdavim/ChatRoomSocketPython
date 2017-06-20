@@ -39,6 +39,7 @@ sslcontext = ssl._create_unverified_context()
 sslcontext.load_cert_chain(certfile="server.crt", keyfile="server.key")
 tcp_server.setblocking(0)
 server_address = (HOST, PORT)
+tcp_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 #Bind socket
 tcp_server.bind(server_address)
@@ -85,9 +86,9 @@ while inputs:
 			outputs.remove(s)
 		else:
 			if next_msg[:2]=='i/':
-				broadcast_data(s,"i"+users[str(client_address)]+" diz:\n\t"+next_msg[1:])
+				broadcast_data(s,"i"+users[s]+" diz:\n\t"+next_msg[1:])
 			elif next_msg[:2]=="l/":
-				users[str(client_address)]=next_msg[2:-1].decode("utf-8")
+				users[s]=next_msg[2:].split(" ")[0].decode("utf-8")
 				f=open("users.txt","r")
 				for i in f.readlines():
 					if next_msg[2:]==i:
@@ -106,7 +107,7 @@ while inputs:
 					f.write(next_msg[2:])
 				f.close()
 			else:
-				broadcast_data(s,users[str(client_address)]+" diz:\n\t"+next_msg)
+				broadcast_data(s,users[s]+" diz:\n\t"+next_msg)
 
 	for s in exceptional:
 		inputs.remove(s)
@@ -114,6 +115,5 @@ while inputs:
 			outputs.remove(s)
 		s.close()
 		del message_queues[s]
-		
-tcp_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
 tcp_server.close()
