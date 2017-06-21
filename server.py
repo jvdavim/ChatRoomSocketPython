@@ -66,7 +66,7 @@ while inputs:
 			inputs.append(sslcon)
 			message_queues[sslcon] = Queue.Queue()
 		else:
-			data = s.recv(1024)
+			data = s.recv(2048)
 			print str(client_address)+": "+data
 			if data:
 				message_queues[s].put(data)
@@ -88,7 +88,7 @@ while inputs:
 			if next_msg[:2]=='i/':
 				broadcast_data(s,"i"+users[s]+" diz:\n\t"+next_msg[1:])
 			elif next_msg[:2]=="l/":
-				users[s]=next_msg[2:].split(" ")[0].decode("utf-8")
+				users[s]=next_msg[2:].split(" ")[0]
 				f=open("users.txt","r")
 				for i in f.readlines():
 					if next_msg[2:]==i:
@@ -102,12 +102,14 @@ while inputs:
 					if i.split(" ")[0]==next_msg[2:].split(" ")[0]:
 						conflict=True
 				if conflict:
-					print "Ja Existe"
+					send_data_to(s,"e/")
 				else:
 					f.write(next_msg[2:])
+					send_data_to(s,"s/")
 				f.close()
 			else:
-				broadcast_data(s,users[s]+" diz:\n\t"+next_msg)
+				answer = (users[s]+" diz:\n\t")+(next_msg.decode("utf-8"))
+				broadcast_data(s,answer.encode("utf-8"))
 
 	for s in exceptional:
 		inputs.remove(s)

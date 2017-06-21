@@ -17,8 +17,12 @@ class ClientThread(Thread):
 		self.gui = GuiThread(self.sslcon)
 		self.gui.start()
 		while self.gui.running:
-			self.data = self.sslcon.recv(1024)
-			if self.data!="":
+			self.data = self.sslcon.recv(2048)
+			if self.data!="" and self.data!="e/" and self.data!="s/":
 				self.gui.show(self.data)
+			elif self.data == "e/":
+				self.gui.error_message()
+			elif self.data == "s/":
+				self.gui.successful_message()
 			self.gui.textarea.see("end")
 			#os.system("play --no-show-progress --null --channels 1 synth 1 sine 1000")  #BARUHLHO

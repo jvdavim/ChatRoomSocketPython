@@ -1,4 +1,4 @@
-import socket, time
+import socket, time, tkMessageBox
 from threading import Thread
 from Tkinter import *
 from tkFileDialog import askopenfilename
@@ -69,11 +69,12 @@ class GuiThread(Thread):
 		logup=Button(loginframe,text="CADASTRAR",bg="#25D366",fg="white",command=self.register)
 		logup.pack(side=LEFT)
 		loginframe.pack()
-		self.login.attributes("-topmost",True)
+		# self.login.attributes("-topmost",True)
 		self.username.bind("<Return>",self.auth)
 		self.username.bind("<KP_Enter>",self.auth)
 		self.password.bind("<Return>",self.auth)
 		self.password.bind("<KP_Enter>",self.auth)
+		self.login.resizable(width=False,height=False)
 
 		self.s.withdraw()
 		self.s.mainloop()
@@ -89,7 +90,6 @@ class GuiThread(Thread):
 
 	def show(self, data):
 		if data[0]=='i':
-			print data
 			data=data[1:]
 			self.textarea.config(state=NORMAL)
 			self.textarea.insert(END,data.split("\n")[0])
@@ -139,6 +139,12 @@ class GuiThread(Thread):
 	def register(self,event=None):
 		self.tcp_client.send(("c/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
 		time.sleep(1)
+
+	def error_message(self):
+		tkMessageBox.showerror("Erro", "Ja existe um usuario com esse login.")
+
+	def successful_message(self):
+		tkMessageBox.showinfo("Cadastro", "Cadastro efetuado com sucesso!")
 
 	def on_close(self):
 		self.running = False
