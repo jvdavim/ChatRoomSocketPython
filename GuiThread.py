@@ -147,6 +147,9 @@ class GuiThread(Thread):
 	def successful_message(self):
 		tkMessageBox.showinfo("Cadastro", "Cadastro efetuado com sucesso!")
 
+	def failedlogin_message(self):
+		tkMessageBox.showwarning("Acesso Negado", "Senha incorreta ou usuario inexistente.")
+
 	def on_close(self):
 		self.running = False
 		self.tcp_client.close()

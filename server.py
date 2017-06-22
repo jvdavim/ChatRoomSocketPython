@@ -90,10 +90,14 @@ while inputs:
 			elif next_msg[:2]=="l/":
 				users[s]=next_msg[2:].split(" ")[0]
 				with open("users.txt","r") as f:
+					failure=True
 					for i in f:
 						if next_msg[2:]==i.rstrip("\n"):
 							broadcast_data(s,i.split(" ")[0]+" entrou na sala.")
 							send_data_to(s,"OK OK")
+							failure=False
+					if failure:
+						send_data_to(s,"f/")
 					f.close()
 			elif next_msg[:2]=="c/":
 				with open("users.txt","r+") as f:
