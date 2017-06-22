@@ -1,4 +1,4 @@
-import socket, time, tkMessageBox
+import socket, time, tkMessageBox, hashlib
 from threading import Thread
 from Tkinter import *
 from tkFileDialog import askopenfilename
@@ -134,11 +134,11 @@ class GuiThread(Thread):
 		self.textarea.see("end")
 
 	def auth(self,event=None):
-		self.tcp_client.send(("l/"+self.username.get()).encode("utf-8")+" "+self.password.get().encode("utf-8"))
+		self.tcp_client.send(("l/"+self.username.get()).encode("utf-8")+" "+hashlib.sha256(self.password.get().encode("utf-8")).hexdigest())
 		time.sleep(1)
 
 	def register(self,event=None):
-		self.tcp_client.send(("c/"+self.username.get()).encode("utf-8")+" "+self.password.get().encode("utf-8"))
+		self.tcp_client.send(("c/"+self.username.get()).encode("utf-8")+" "+hashlib.sha256(self.password.get().encode("utf-8")).hexdigest())
 		time.sleep(1)
 
 	def error_message(self):
