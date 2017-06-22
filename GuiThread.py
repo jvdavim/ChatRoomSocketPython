@@ -35,7 +35,7 @@ class GuiThread(Thread):
 		self.filebutton=Button(text="CARREGAR TEXTO",bg="#128C7E",fg="white",command=self.sendFile)
 		self.filebutton.pack(in_=self.buttonframe, side=RIGHT)
 
-		#Caixa de texto onde as mensagens são escritas pelo usuario
+		#Caixa de texto onde as mensagens sao escritas pelo usuario
 		self.writearea=Text(height=5, width=50)
 		self.writearea.pack(in_=self.frame, side=BOTTOM)
 
