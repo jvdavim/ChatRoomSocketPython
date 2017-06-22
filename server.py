@@ -1,31 +1,32 @@
 import select, socket, sys, Queue, time, signal, ssl
 
-#Exit handler
+
 def signal_handler(signal, frame):
+	#Trata sinal para saida
 	print "\nSuccessful exit. Server is now down."
 	sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
 
 def broadcast_data (sock, message):
-	#Do not send the message to master socket and the client who has send us the message
+	#Envia mensagem para todos os clientes menos para si mesmo
 	for socket in inputs:
 		if socket != tcp_server and socket != sock:
 			try :
 				socket.send(message)
 			except :
-				# broken socket connection may be, chat client pressed ctrl+c for example
+				#Falha na conexao com o cliente
 				socket.close()
 				inputs.remove(socket)
 
 def send_data_to(sock, message):
-	#Do not send the message to master socket and the client who has send us the message
+	#Envia mensagem para um cliente especifico
 	for socket in inputs:
 		if socket == sock:
 			try :
 				socket.send(message)
 			except :
-				# broken socket connection may be, chat client pressed ctrl+c for example
+				#Falha na conexao com o cliente
 				socket.close()
 				inputs.remove(socket)
 
@@ -33,7 +34,7 @@ def send_data_to(sock, message):
 HOST = ''			  # Server IP address
 PORT = 5000			# Server port
 
-#Init socket's variables
+#Inicializa variaveis para o socket
 tcp_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sslcontext = ssl._create_unverified_context()
 sslcontext.load_cert_chain(certfile="server.crt", keyfile="server.key")
@@ -41,13 +42,13 @@ tcp_server.setblocking(0)
 server_address = (HOST, PORT)
 tcp_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-#Bind socket
+#Da bind na porta
 tcp_server.bind(server_address)
 
-#Listen clients
+#Fica em estado listen aguardando clientes
 tcp_server.listen(5)
 
-#Declare sockets lists and queues
+#Declaracao de listas e filas de sockets, mensagens e usuarios
 inputs = [tcp_server]
 outputs = []
 message_queues = {}
@@ -55,7 +56,7 @@ users={}
 
 print "Successful creation. Server is now up."
 
-#Loop while to connect clients and message delivery
+#Loop while para realizar a conexao com os clientes e entregar as mensagens
 while inputs:
 	readable, writable, exceptional = select.select(inputs, outputs, inputs)
 	for s in readable:

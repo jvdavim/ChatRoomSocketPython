@@ -11,27 +11,35 @@ class GuiThread(Thread):
 
 	
 	def run(self):
+		#Inicializar interface
 		self.s=Tk()
 
+		#Evento ao fechar a janela
 		self.s.protocol("WM_DELETE_WINDOW", self.on_close)
 
+		#Define titulo e ...
 		self.frame=Frame(self.s, height=500)
 		self.s.title("Ez Pz Chat")
 
 		self.buttonframe=Frame(self.s)
 
+		#Botao TRANSFERIR ARQUIVO
 		self.imagebutton=Button(text="TRANSFERIR ARQUIVO",bg="#128C7E",fg="white",command=self.sendImage)
 		self.imagebutton.pack(in_=self.buttonframe, side=RIGHT)
 
+		#Botao ENVIAR
 		self.sendbutton=Button(text="ENVIAR",bg="#075E54",fg="white",command=self.sendText)
 		self.sendbutton.pack(in_=self.buttonframe, side=RIGHT)
 
+		#Botao CARREGAR TEXTO
 		self.filebutton=Button(text="CARREGAR TEXTO",bg="#128C7E",fg="white",command=self.sendFile)
 		self.filebutton.pack(in_=self.buttonframe, side=RIGHT)
 
+		#Caixa de texto onde as mensagens são escritas pelo usuario
 		self.writearea=Text(height=5, width=50)
 		self.writearea.pack(in_=self.frame, side=BOTTOM)
 
+		#Caixa de texto onde as mensagens sao entregues aos usuarios e a barra de rolagem
 		self.textarea=Text(height=25, width=50)
 		self.textarea.pack(in_=self.frame)
 		self.scrollbar=Scrollbar()
@@ -41,15 +49,19 @@ class GuiThread(Thread):
 		self.textarea.config(yscrollcommand=self.scrollbar.set)
 		self.textarea.config(state=DISABLED)
 
+		#Tecla enter envia mensagem
 		self.s.bind("<Return>",self.sendText)
 		self.s.bind("<KP_Enter>",self.sendText)
 		self.frame.pack()
 		self.buttonframe.pack(side=BOTTOM)
 
+		#Tamanho da janela fixo
 		self.s.resizable(width=False,height=False)
 
+		#Seta cursor ao entrar na sala
 		self.writearea.focus_set()
 
+		#Tela de login/cadastro
 		self.login=Toplevel()
 		userframe=Frame(self.login)
 		passframe=Frame(self.login)
@@ -77,10 +89,12 @@ class GuiThread(Thread):
 		self.login.resizable(width=False,height=False)
 		self.username.focus_set()
 
+		#Desenhar e permanecer no loop
 		self.s.withdraw()
 		self.s.mainloop()
 
 	def sendText(self, event=None):
+		#Evento que determina o que ocorre ao enviar uma mensagem no chat
 		msg = self.writearea.get("1.0",END)
 		if msg[0]!="\n":
 			self.tcp_client.send("m/"+msg.encode("utf-8"))
@@ -91,6 +105,7 @@ class GuiThread(Thread):
 		self.writearea.delete("1.0",END)
 
 	def show(self, data):
+		#Mostrar "data" na area de texto compartilhada
 		if data[0]=='i':
 			data=data[1:]
 			self.textarea.config(state=NORMAL)
@@ -112,6 +127,7 @@ class GuiThread(Thread):
 			self.textarea.config(state=DISABLED)
 
 	def sendFile(self, event=None):
+		#Evento que determina o que ocorre ao enviar um "file" no chat
 		path=askopenfilename()
 		myfile=open(path,"rb")
 		data=myfile.read()
@@ -123,6 +139,7 @@ class GuiThread(Thread):
 		self.textarea.see("end")
 
 	def sendImage(self,event=None):
+		#Evento que determina o que ocorre ao enviar uma "image" no chat
 		path=askopenfilename()
 		myfile=open(path,"rb")
 		data=myfile.read()
@@ -135,23 +152,29 @@ class GuiThread(Thread):
 		self.textarea.see("end")
 
 	def auth(self,event=None):
+		#Evento que determina o que ocorre quando um usuario tenta logar
 		self.tcp_client.send(("l/"+self.username.get()).encode("utf-8")+" "+hashlib.sha256(self.password.get().encode("utf-8")).hexdigest())
 		time.sleep(1)
 
 	def register(self,event=None):
+		#Evento que determina o que ocorre quando um usuario tenta se cadastrar
 		self.tcp_client.send(("c/"+self.username.get()).encode("utf-8")+" "+hashlib.sha256(self.password.get().encode("utf-8")).hexdigest())
 		time.sleep(1)
 
 	def error_message(self):
+		#Mostra mensagem de erro em uma messagebox
 		tkMessageBox.showerror("Erro", "Ja existe um usuario com esse login.")
 
 	def successful_message(self):
+		#Mostra mensagem de informacao em uma messagebox
 		tkMessageBox.showinfo("Cadastro", "Cadastro efetuado com sucesso!")
 
 	def failedlogin_message(self):
+		#Mostra mensagem de aviso em uma messagebox
 		tkMessageBox.showwarning("Acesso Negado", "Senha incorreta ou usuario inexistente.")
 
 	def on_close(self):
+		#Determina o que ocorre ao fechar a interface grafica
 		if tkMessageBox.askyesno(title="Saindo?", message="Deseja realmente sair?"):
 			self.running = False
 			self.tcp_client.close()
