@@ -82,11 +82,12 @@ class GuiThread(Thread):
 
 	def sendText(self, event=None):
 		msg = self.writearea.get("1.0",END)
-		self.tcp_client.send(msg.encode("utf-8"))
-		self.textarea.config(state=NORMAL)
-		self.textarea.insert(END,"Eu: \n\t"+msg)
-		self.textarea.config(state=DISABLED)
-		self.textarea.see("end")
+		if msg[0]!="\n":
+			self.tcp_client.send("m/"+msg.encode("utf-8"))
+			self.textarea.config(state=NORMAL)
+			self.textarea.insert(END,"Eu: \n\t"+msg)
+			self.textarea.config(state=DISABLED)
+			self.textarea.see("end")
 		self.writearea.delete("1.0",END)
 
 	def show(self, data):

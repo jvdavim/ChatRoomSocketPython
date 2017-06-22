@@ -111,7 +111,8 @@ while inputs:
 						f.write(next_msg[2:]+"\n")
 						send_data_to(s,"s/")
 					f.close()
-			else:
+			elif next_msg[:2]=="m/":
+				next_msg=next_msg[2:]
 				answer = (users[s]+" diz:\n\t")+(next_msg.decode("utf-8"))
 				broadcast_data(s,answer.encode("utf-8"))
 
