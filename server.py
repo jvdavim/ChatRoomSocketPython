@@ -89,24 +89,24 @@ while inputs:
 				broadcast_data(s,"i"+users[s]+" diz:\n\t"+next_msg[1:])
 			elif next_msg[:2]=="l/":
 				users[s]=next_msg[2:].split(" ")[0]
-				f=open("users.txt","r")
-				for i in f.readlines():
-					if next_msg[2:]==i:
-						broadcast_data(s,i.split(" ")[0]+" entrou na sala.")
-						send_data_to(s,"OK OK")
-				f.close()
+				with open("users.txt","r") as f:
+					for i in f:
+						if next_msg[2:]==i.rstrip("\n"):
+							broadcast_data(s,i.split(" ")[0]+" entrou na sala.")
+							send_data_to(s,"OK OK")
+					f.close()
 			elif next_msg[:2]=="c/":
-				f=open("users.txt","r+")
-				conflict=False
-				for i in f.readlines():
-					if i.split(" ")[0]==next_msg[2:].split(" ")[0]:
-						conflict=True
-				if conflict:
-					send_data_to(s,"e/")
-				else:
-					f.write(next_msg[2:])
-					send_data_to(s,"s/")
-				f.close()
+				with open("users.txt","r+") as f:
+					conflict=False
+					for i in f:
+						if i.rstrip("\n").split(" ")[0]==next_msg[2:].split(" ")[0]:
+							conflict=True
+					if conflict:
+						send_data_to(s,"e/")
+					else:
+						f.write(next_msg[2:]+"\n")
+						send_data_to(s,"s/")
+					f.close()
 			else:
 				answer = (users[s]+" diz:\n\t")+(next_msg.decode("utf-8"))
 				broadcast_data(s,answer.encode("utf-8"))

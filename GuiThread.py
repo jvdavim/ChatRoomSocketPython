@@ -56,11 +56,11 @@ class GuiThread(Thread):
 		loginframe=Frame(self.login)
 		label=Label(userframe,text="Nome de usuario:")
 		label.pack(side=LEFT)
-		self.username=Text(userframe,width=15,height=1)
+		self.username=Entry(userframe,width=12)
 		self.username.pack(side=LEFT)
 		label2=Label(passframe,text="Senha de acesso:")
 		label2.pack(side=LEFT)
-		self.password=Text(passframe,width=15,height=1)
+		self.password=Entry(passframe,width=12,show="*")
 		self.password.pack(side=LEFT)
 		userframe.pack()
 		passframe.pack()
@@ -75,6 +75,7 @@ class GuiThread(Thread):
 		self.password.bind("<Return>",self.auth)
 		self.password.bind("<KP_Enter>",self.auth)
 		self.login.resizable(width=False,height=False)
+		self.username.focus_set()
 
 		self.s.withdraw()
 		self.s.mainloop()
@@ -133,11 +134,11 @@ class GuiThread(Thread):
 		self.textarea.see("end")
 
 	def auth(self,event=None):
-		self.tcp_client.send(("l/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
+		self.tcp_client.send(("l/"+self.username.get()).encode("utf-8")+" "+self.password.get().encode("utf-8"))
 		time.sleep(1)
 
 	def register(self,event=None):
-		self.tcp_client.send(("c/"+self.username.get("1.0",END)).encode("utf-8")[:-1]+" "+self.password.get("1.0",END).encode("utf-8"))
+		self.tcp_client.send(("c/"+self.username.get()).encode("utf-8")+" "+self.password.get().encode("utf-8"))
 		time.sleep(1)
 
 	def error_message(self):
