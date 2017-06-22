@@ -151,7 +151,8 @@ class GuiThread(Thread):
 		tkMessageBox.showwarning("Acesso Negado", "Senha incorreta ou usuario inexistente.")
 
 	def on_close(self):
-		self.running = False
-		self.tcp_client.close()
-		self.s.destroy()
-		sys.exit(0)
+		if tkMessageBox.askyesno(title="Saindo?", message="Deseja realmente sair?"):
+			self.running = False
+			self.tcp_client.close()
+			self.s.destroy()
+			sys.exit(0)
