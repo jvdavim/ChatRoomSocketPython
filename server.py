@@ -67,7 +67,7 @@ while inputs:
 			inputs.append(sslcon)
 			message_queues[sslcon] = Queue.Queue()
 		else:
-			data = s.recv(2048)
+			data = s.recv(1048576)
 			print str(client_address)+": "+data
 			if data:
 				message_queues[s].put(data)

@@ -17,7 +17,7 @@ class ClientThread(Thread):
 		self.gui = GuiThread(self.sslcon)
 		self.gui.start()
 		while self.gui.running:
-			self.data = self.sslcon.recv(2048)
+			self.data = self.sslcon.recv(1048576)
 			if self.data == "e/":
 				self.gui.error_message()
 			elif self.data == "s/":

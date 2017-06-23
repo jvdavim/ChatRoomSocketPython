@@ -128,19 +128,19 @@ class GuiThread(Thread):
 			self.textarea.config(state=DISABLED)
 
 	def sendFile(self, event=None):
-		#Evento que determina o que ocorre ao enviar um "file" no chat
+		#Evento que le um arquivo txt e escreve no chat
 		path=askopenfilename()
 		myfile=open(path,"rb")
 		data=myfile.read()
 		myfile.close()
-		self.tcp_client.send((path+"\n"+data).encode("utf-8"))
+		self.tcp_client.send("m/"+(path+"\n"+data).encode("utf-8"))
 		self.textarea.config(state=NORMAL)
 		self.textarea.insert(END,"Eu: \n\t"+path+"\n"+data)
 		self.textarea.config(state=DISABLED)
 		self.textarea.see("end")
 
 	def sendImage(self,event=None):
-		#Evento que determina o que ocorre ao enviar uma "image" no chat
+		#Evento que salva um arquivo no diretorio do cliente que recebe
 		path=askopenfilename()
 		myfile=open(path,"rb")
 		data=myfile.read()
