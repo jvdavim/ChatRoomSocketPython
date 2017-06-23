@@ -1,4 +1,4 @@
-import socket, time, tkMessageBox, hashlib
+import socket, time, tkMessageBox, hashlib, os, signal
 from threading import Thread
 from Tkinter import *
 from tkFileDialog import askopenfilename
@@ -63,6 +63,7 @@ class GuiThread(Thread):
 
 		#Tela de login/cadastro
 		self.login=Toplevel()
+		self.login.protocol("WM_DELETE_WINDOW", self.on_close)
 		userframe=Frame(self.login)
 		passframe=Frame(self.login)
 		loginframe=Frame(self.login)
@@ -111,7 +112,7 @@ class GuiThread(Thread):
 			self.textarea.config(state=NORMAL)
 			self.textarea.insert(END,data.split("\n")[0])
 			self.textarea.insert(END,"\n"+data.split("\n")[1])
-			self.textarea.insert(END,"\n\t/ARQUIVO RECEBIDO/")
+			self.textarea.insert(END,"\n\t/ARQUIVO RECEBIDO/\n")
 			self.textarea.config(state=DISABLED)
 			filename=data.split("\n")[1].split("/")[-1]
 			myfile=open(filename,"wb")
@@ -179,4 +180,5 @@ class GuiThread(Thread):
 			self.running = False
 			self.tcp_client.close()
 			self.s.destroy()
-			sys.exit(0)
+			#sys.exit(0)
+			os.kill(os.getpid(),signal.SIGTERM)

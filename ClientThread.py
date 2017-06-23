@@ -27,4 +27,6 @@ class ClientThread(Thread):
 			else:
 				self.gui.show(self.data)
 			self.gui.textarea.see("end")
+		print "Successful exit."
+		sys.exit(0)
 			#os.system("play --no-show-progress --null --channels 1 synth 1 sine 1000")  #BARUHLHO
